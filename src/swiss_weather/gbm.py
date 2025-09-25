@@ -94,40 +94,40 @@ def get_parameters_by_station(sta, full_description=False, lookup=None, language
     return output
 
 
-def get_param_description(parameter, language='fr'):
+def get_param_description(shortname, language='fr'):
     """ 
     Get description of a meteorological parameter from its shortname.
 
     ARGUMENTS: 
-        - parameter (string): the parameter shortname (e.g. rre150h0) as provided by get_meteo_parameters_info()
+        - shortname (string): the parameter shortname (e.g. rre150h0) as provided by get_meteo_parameters_info()
         - language ('fr' or 'en', default='fr') for the output parameter description
 
     RETURNS: a string describing the meteorological parameter.
     """
     all_param_info = get_meteo_parameters_info(full_description=False, language=language)
-    par_row = all_param_info[all_param_info['parameter_shortname'] == parameter]
+    par_row = all_param_info[all_param_info['parameter_shortname'] == shortname]
     if len(par_row) == 0:
-        raise ValueError(f"No entry found for parameter {parameter} !")
+        raise ValueError(f"No entry found for parameter {shortname} !")
     elif len(par_row) > 1:
-        raise ValueError(f"Multiple entries found for parameter {parameter} !")
+        raise ValueError(f"Multiple entries found for parameter {shortname} !")
     else:
         par_row.index
         param_description = par_row['parameter_description_' + language].get(par_row.index[0])
         return param_description
     
 
-def check_parameter_availability(parameter, sta):
+def check_parameter_availability(shortname, sta):
     """ 
     Check the availability of a meteorological parameter at a given station.
 
     ARGUMENTS: 
-        - parameter (string): the parameter shortname (e.g. rre150h0) as provided by get_meteo_parameters_info()
+        - shortname (string): the parameter shortname (e.g. rre150h0) as provided by get_meteo_parameters_info()
         - sta (string): the SwissMetNet meteorological station (e.g. GVE, CGI, PAY,...)
 
     RETURNS: a boolean.
     """
     sta_params = get_parameters_by_station(sta)
-    par_row = sta_params[sta_params['parameter_shortname'] == parameter]
+    par_row = sta_params[sta_params['parameter_shortname'] == shortname]
     
     if len(par_row) == 1:
         return True
@@ -247,11 +247,11 @@ def get_smn_measures(sta, parameters, beg=None, end=None, description_lang='fr')
         print(f"Retrieving all available measurements")
     else:
         if beg is None:
-            print(f"Retrieving measurements from the beginning of measurement to {end.strftime('%d-%m-%Y %H:%M')}")
+            print(f"Retrieving measurements at {sta} from the beginning of measurement to {end.strftime('%d-%m-%Y %H:%M')}")
         elif end is None:
-            print(f"Trying to retrieve measurements from {beg.strftime('%d-%m-%Y %H:%M')} to latest available timestamp")
+            print(f"Trying to retrieve measurements at {sta} from {beg.strftime('%d-%m-%Y %H:%M')} to latest available timestamp")
         else:
-            print(f"Trying to retrieve measurements from {beg.strftime('%d-%m-%Y %H:%M')} to {end.strftime('%d-%m-%Y %H:%M')}")
+            print(f"Trying to retrieve measurements at {sta} from {beg.strftime('%d-%m-%Y %H:%M')} to {end.strftime('%d-%m-%Y %H:%M')}")
 
     # names of the columns that will be returned in output dataframe:
     cols = ['time', 'nat_abbr_tx']
