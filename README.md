@@ -11,7 +11,7 @@ This package was not developed and is not suppported by MeteoSwiss. It however r
 # Installation
 
 ```
-pip install swiss_weather
+pip install swiss-weather
 ```
 
 # Usage
