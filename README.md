@@ -30,7 +30,7 @@ Get information about all SwissMetNet (SMN) weather stations in a pd.DataFrame:
 ```
 gbm.get_smn_stations_info()
 ```
-Search for a meteorological parameter:
+Look for a meteorological parameter:
 
 ```
 gbm.get_meteo_parameters_info()
@@ -92,18 +92,27 @@ Each parameter has its own granularity, as specified in the output of `get_meteo
 
 ## Download recordings from a given weather station:
 
-The function `get_smn_measures()` allows to download data recorded at a given weather station for several meteorological parameters and for a specified period. It returns data organized in a Pandas `pd.DataFrame`.
+The function `get_smn_measures()` downloads data recorded at a given weather station for several meteorological parameters and for a specified period. It returns data organized in a Pandas `pd.DataFrame`.
 
 **Example 1:** get daily maximum temperature and daily sum of precipitation recorded at Genève-Cointrin from May 15. 2025 and to the latest available record:
 
 ```
-df = gbm.get_smn_measures(sta='GVE', parameters=['tre200dx', 'rka150d0'], beg='202405150000')
+df = gbm.get_smn_measures(
+    sta='GVE',
+    parameters=['tre200dx', 'rka150d0'],
+    beg='202405150000'
+)
 ```
 
 **Example 2:** get hourly mean temperature and hourly sum of precipitation recorded at Payerne from January 15. 2010 at 06:00 UTC to March 1. 2010 at 18:00 UTC:
 
 ```
-df = gbm.get_smn_measures(sta='PAY', parameters=['tre200h0', 'rre150h0'], beg='201001150600', end='201003011800')
+df = gbm.get_smn_measures(
+    sta='PAY',
+    parameters=['tre200h0', 'rre150h0'],
+    beg='201001150600',
+    end='201003011800'
+)
 ```
 
 # Examples

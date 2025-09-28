@@ -148,7 +148,6 @@ def get_smn_data(sta, granularity, past_type=None, historical_period=None):
     RETURNS: a pd.DataFrame with the content of the retrieved csv file
     """
 
-    #BASE_URL_SMN = "https://sys-data.int.bgdi.ch/ch.meteoschweiz.ogd-smn" # old root url
     BASE_URL_SMN = "https://data.geo.admin.ch/ch.meteoschweiz.ogd-smn"
 
     if granularity in ['d', 'h', 't'] and past_type is None:
@@ -176,7 +175,7 @@ def get_smn_data(sta, granularity, past_type=None, historical_period=None):
         url_suffix = url_suffix_base
 
     url = os.path.join(BASE_URL_SMN, sta.lower(), url_suffix + '.csv')
-    print(url)
+    #print(url)
 
     try:
         # in production, please check if a local copy of the files already exists. If so, please
@@ -184,7 +183,6 @@ def get_smn_data(sta, granularity, past_type=None, historical_period=None):
         # requesting the resource) in an If-None-Match header. The server will only send the file,
         # if the remote version is newer than your local file. This avoids unnecessary traffic.
         # (also check here: https://data.geo.admin.ch/api/stac/static/spec/v1/apitransactional.html#tag/Data/operation/getAssetObject)
-        # For our short example, we don't need to do 4all this.
         df = pd.read_csv(
             url,
             delimiter=';',
@@ -209,9 +207,7 @@ def sanitize_smn_data(df):
     """
 
     df_cleaned = df.rename(columns={'reference_timestamp': 'time'})
-    #df_cleaned['time'] = df_cleaned['time'].apply(pd.to_datetime, dayfirst=True)
-    #df_cleaned.set_index('timestamp', inplace=True)
-    
+        
     return df_cleaned
 
 
@@ -264,11 +260,9 @@ def get_smn_measures(sta, parameters, beg=None, end=None, description_lang='fr')
     is_any_data_available = False
     for param in parameters:
         param_row = df_params_by_sta.loc[df_params_by_sta['parameter_shortname'] == param]
-        #param_row = PARAMETERS_DESCRIPTION.loc[PARAMETERS_DESCRIPTION['parameter_shortname'] == param]
         param_granu = param_row['parameter_granularity'].item().lower()
         param_granu_list.append(param_granu)
         param_description = param_row[f"parameter_description_{description_lang}"].item()
-        #param_description_fr = param_row['parameter_description_fr'].item()
         param_avail_since = datetime.strptime(param_row['data_since'].item(), '%d.%m.%Y %H:%M')
         print(
             f"Retrieving data for parameter {param}: \n"
@@ -297,7 +291,6 @@ def get_smn_measures(sta, parameters, beg=None, end=None, description_lang='fr')
                     'h': [1980, 1990, 2000, 2010, 2020, 2030],
                     't': [2000, 2010, 2020, 2030]   
                 }
-                #print(f"Retrieve historical data from {beg}")
                 batch_beg_idx = 0
                 if beg is not None:
                     if beg.year > HIST_BATCHES[param_granu][0]:
@@ -310,13 +303,9 @@ def get_smn_measures(sta, parameters, beg=None, end=None, description_lang='fr')
                         # returns the first index greater than end.year
                         batch_end_idx = [i for i,b in enumerate(HIST_BATCHES[param_granu]) if b > end.year][0]
 
-                # print(batch_beg_idx, batch_end_idx)
-                # print(range(batch_beg_idx, batch_end_idx))
-
                 for batch_idx in range(batch_beg_idx, batch_end_idx):
                     batch_beg_year = HIST_BATCHES[param_granu][batch_idx]
                     batch_suffix = f"{str(batch_beg_year)}-{str(batch_beg_year + 9)}"
-                    #print(batch_suffix)
                     df_list.append(get_smn_data(sta, param_granu, 'historical', batch_suffix))
             else:
                 df_list.append(get_smn_data(sta, param_granu, 'historical'))
@@ -340,20 +329,15 @@ def get_smn_measures(sta, parameters, beg=None, end=None, description_lang='fr')
                 if param_granu in ['h', 't']:
                     df_list.append(get_smn_data(sta, param_granu, 'now'))
 
-        #print(f"{datetime.now()}: SANITY CHECK: concatenate data...")
         df = pd.concat(df_list)
     
-    #print(f"{datetime.now()}: SANITY CHECK: sanitize data...")
     df = sanitize_smn_data(df)
     # add a column with station abbreviation:
     df['nat_abbr_tx'] = sta
     # keep only requested parameters, as well as 'time' and 'nat_abbr_tx' columns:
     df_param = df[cols]
 
-    #print(f"{datetime.now()}: SANITY CHECK: filter data...")
     if beg is not None and end is not None:
-        #df_filtered = df_param.loc[beg:end] # ok if index sorted by ascending
-        #df_filtered = df_param.loc[(df_param.index >= beg) & (df_param.index <= end)] # works even if index not sorted
         df_filtered = df_param.loc[(df_param['time'] >= beg) & (df_param['time'] <= end)] # time as usual column
     else:
         if beg is not None:
