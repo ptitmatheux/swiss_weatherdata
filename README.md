@@ -11,7 +11,7 @@ This package was not developed and is not suppported by MeteoSwiss. It however r
 # Installation
 
 ```
-pip install swiss-weather
+pip install swiss-weatherdata
 ```
 
 # Usage
@@ -19,13 +19,13 @@ pip install swiss-weather
 Import all functions at once:
 
 ```
-import swiss_weather.gbm as gbm
+import swiss_weatherdata.gbm as gbm
 ```
 
 
 ## Information about weather stations and meteorological parameters
 
-Get information about all SwissMetNet (SMN) weather stations in a pd.DataFrame:
+Get information about all SwissMetNet (SMN) weather stations in a `pd.DataFrame`:
 
 ```
 gbm.get_smn_stations_info()
@@ -117,4 +117,4 @@ df = gbm.get_smn_measures(
 
 # Examples
 
-All previous examples are available in a [Jupyter Notebook](https://github.com/ptitmatheux/swiss_weather/tree/master/docs) on GitHub.
+All previous examples are available in a [Jupyter Notebook](https://github.com/ptitmatheux/swiss_weatherdata/tree/master/docs) on GitHub.

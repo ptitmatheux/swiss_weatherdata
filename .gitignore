@@ -4,4 +4,4 @@ dist
 **/__pycache__/
 
 ## ignored files:
-swiss_weather_develop.ipynb
+swiss_weatherdata_develop.ipynb

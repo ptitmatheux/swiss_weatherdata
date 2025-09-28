@@ -2,12 +2,12 @@
 requires = ["hatchling >= 1.26"]
 build-backend = "hatchling.build"
 [project]
-name = "swiss-weather"
+name = "swiss-weatherdata"
 version = "0.0.1"
 authors = [
   { name="Michel Matter", email="mich1983mat@gmail.com" },
 ]
-description = "An API to download weather recordings from MeteoSwiss"
+description = "An API to easily download open access weather recordings from MeteoSwiss"
 readme = "README.md"
 requires-python = ">=3.9"
 dependencies = [
@@ -21,5 +21,5 @@ license = "MIT"
 license-files = ["LICEN[CS]E*"]
 
 [project.urls]
-Homepage = "https://github.com/ptitmatheux/swiss_weather"
-Issues = "https://github.com/ptitmatheux/swiss_weather/issues"
+Homepage = "https://github.com/ptitmatheux/swiss_weatherdata"
+Issues = "https://github.com/ptitmatheux/swiss_weatherdata/issues"

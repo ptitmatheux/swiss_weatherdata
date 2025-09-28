@@ -1,4 +1,4 @@
-import swiss_weather.gbm as gbm
+import swiss_weatherdata.gbm as gbm
 import pandas as pd
 
 
