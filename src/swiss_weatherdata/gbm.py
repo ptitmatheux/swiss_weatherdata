@@ -28,6 +28,20 @@ def get_smn_stations_info(full_description=False):
         return essential_info
 
 
+def _get_station_name(sta):
+    """ 
+    Get the name of a SMN station given its station_abbr.
+
+    ARGUMENTS: 
+        - sta (string): the SwissMetNet meteorological station (e.g. GVE, CGI, PAY,...)
+    
+    RETURNS: a pd.DataFrame with the list of all stations from the SMN network and their description.
+    """
+    df_all = get_smn_stations_info(full_description=False)
+    sta_name = df_all.loc[df_all['station_abbr'] == sta]['station_name'].item()
+    return sta_name
+
+
 def get_meteo_parameters_info(full_description=False, lookup=None, language='fr'):
     """ 
     Get information about all available meteorological parameters.
@@ -135,7 +149,7 @@ def check_parameter_availability(shortname, sta):
         return False
 
 
-def get_smn_data(sta, granularity, past_type=None, historical_period=None):
+def _get_smn_data(sta, granularity, past_type=None, historical_period=None):
     """
     Get data from a remote csv file into a pd.DataFrame
 
@@ -197,7 +211,7 @@ def get_smn_data(sta, granularity, past_type=None, historical_period=None):
         return None
 
 
-def sanitize_smn_data(df):
+def _sanitize_smn_data(df):
     """
     ARGUMENTS:
         - df (pd.DataFrame): The input DataFrame.
@@ -243,11 +257,11 @@ def get_smn_measures(sta, parameters, beg=None, end=None, description_lang='fr')
         print(f"Retrieving all available measurements")
     else:
         if beg is None:
-            print(f"Retrieving measurements at {sta} from the beginning of measurement to {end.strftime('%d-%m-%Y %H:%M')}")
+            print(f"Retrieving measurements at {sta} ({_get_station_name(sta)}) from the beginning of measurement to {end.strftime('%d-%m-%Y %H:%M')}")
         elif end is None:
-            print(f"Trying to retrieve measurements at {sta} from {beg.strftime('%d-%m-%Y %H:%M')} to latest available timestamp")
+            print(f"Trying to retrieve measurements at {sta} ({_get_station_name(sta)}) from {beg.strftime('%d-%m-%Y %H:%M')} to latest available timestamp")
         else:
-            print(f"Trying to retrieve measurements at {sta} from {beg.strftime('%d-%m-%Y %H:%M')} to {end.strftime('%d-%m-%Y %H:%M')}")
+            print(f"Trying to retrieve measurements at {sta} ({_get_station_name(sta)}) from {beg.strftime('%d-%m-%Y %H:%M')} to {end.strftime('%d-%m-%Y %H:%M')}")
 
     # names of the columns that will be returned in output dataframe:
     cols = ['time', 'nat_abbr_tx']
@@ -281,7 +295,7 @@ def get_smn_measures(sta, parameters, beg=None, end=None, description_lang='fr')
     
     # retrieve all needed files containing the data and concatenate them:        
     if param_granu in ['m', 'y']: # for these granularities, there is a single file with all the data
-        df = get_smn_data(sta, param_granu)
+        df = _get_smn_data(sta, param_granu)
     else:
         today_start = datetime.combine(date.today(), time())
         df_list = []
@@ -306,32 +320,32 @@ def get_smn_measures(sta, parameters, beg=None, end=None, description_lang='fr')
                 for batch_idx in range(batch_beg_idx, batch_end_idx):
                     batch_beg_year = HIST_BATCHES[param_granu][batch_idx]
                     batch_suffix = f"{str(batch_beg_year)}-{str(batch_beg_year + 9)}"
-                    df_list.append(get_smn_data(sta, param_granu, 'historical', batch_suffix))
+                    df_list.append(_get_smn_data(sta, param_granu, 'historical', batch_suffix))
             else:
-                df_list.append(get_smn_data(sta, param_granu, 'historical'))
+                df_list.append(_get_smn_data(sta, param_granu, 'historical'))
 
             if end is None:
-                df_list.append(get_smn_data(sta, param_granu, 'recent'))
+                df_list.append(_get_smn_data(sta, param_granu, 'recent'))
                 if param_granu in ['h', 't']:
-                    df_list.append(get_smn_data(sta, param_granu, 'now'))
+                    df_list.append(_get_smn_data(sta, param_granu, 'now'))
             else:
                 if end.year >= today_start.year:
-                    df_list.append(get_smn_data(sta, param_granu, 'recent'))
+                    df_list.append(_get_smn_data(sta, param_granu, 'recent'))
                     if end >= today_start and param_granu in ['h', 't']:
-                        df_list.append(get_smn_data(sta, param_granu, 'now'))
+                        df_list.append(_get_smn_data(sta, param_granu, 'now'))
         else:
             if beg < today_start:
-                df_list.append(get_smn_data(sta, param_granu, 'recent'))
+                df_list.append(_get_smn_data(sta, param_granu, 'recent'))
                 if end is None or end >= today_start:
                     if param_granu in ['h', 't']:
-                        df_list.append(get_smn_data(sta, param_granu, 'now'))
+                        df_list.append(_get_smn_data(sta, param_granu, 'now'))
             else:
                 if param_granu in ['h', 't']:
-                    df_list.append(get_smn_data(sta, param_granu, 'now'))
+                    df_list.append(_get_smn_data(sta, param_granu, 'now'))
 
         df = pd.concat(df_list)
     
-    df = sanitize_smn_data(df)
+    df = _sanitize_smn_data(df)
     # add a column with station abbreviation:
     df['nat_abbr_tx'] = sta
     # keep only requested parameters, as well as 'time' and 'nat_abbr_tx' columns:
