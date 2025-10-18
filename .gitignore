@@ -1,6 +1,7 @@
 
 ## ignored folders:
 dist
+data
 **/__pycache__/
 
 ## ignored files:
