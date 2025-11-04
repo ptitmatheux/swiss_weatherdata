@@ -18,9 +18,7 @@ def get_stations_info(full_description=False, network='smn'):
                                     https://www.meteoswiss.admin.ch/weather/measurement-systems/land-based-stations/swiss-national-basic-climatological-network.html
     RETURNS: a pd.DataFrame with the list of all stations from the SMN network and their description.
     """
-    # URL = "https://data.geo.admin.ch/ch.meteoschweiz.ogd-smn/ogd-smn_meta_stations.csv"
-    ## climate stations (NBCN):
-    # URL = "https://data.geo.admin.ch/ch.meteoschweiz.ogd-nbcn/ogd-nbcn_meta_stations.csv"
+
     assert isinstance(full_description, bool), "Bad value for argument 'full_description' ; must be True or False !" 
     assert network in ['smn', 'nbcn'], "Bad value for argument 'network' !"
 
@@ -51,7 +49,9 @@ def _get_station_name(sta, network='smn'):
     
     RETURNS: a pd.DataFrame with the list of all stations from the SMN network and their description.
     """
+
     assert isinstance(sta, str) and len(sta) == 3, "Argument 'sta' must be provided as a 3-letter string corresponding to the station nat_abbr !"
+    
     df_all = get_stations_info(full_description=False, network=network)
     df_sta = df_all.loc[df_all['station_abbr'] == sta]
     if len(df_sta) == 1:
@@ -78,10 +78,7 @@ def get_meteo_parameters_info(full_description=False, lookup=None, language='fr'
 
     RETURNS: a pd.DataFrame with the list of all available meteorological parameters and their description.
     """
-    #URL = "https://data.geo.admin.ch/ch.meteoschweiz.ogd-smn/ogd-smn_meta_parameters.csv"
-    ## climate stations (NBCN):
-    # URL = "https://data.geo.admin.ch/ch.meteoschweiz.ogd-nbcn/ogd-nbcn_meta_parameters.csv"
-
+    
     assert isinstance(full_description, bool), "Bad value for argument 'full_description' ; must be True or False !" 
     assert lookup is None or isinstance(lookup, str), "Bad value for argument 'lookup' ; must be string or 'None' !"
     assert language in ['fr', 'en'], "Bad value for argument 'language' ; must be string either 'fr' or 'en' !"
@@ -126,9 +123,7 @@ def get_parameters_by_station(sta, full_description=False, lookup=None, language
 
     RETURNS: a pd.DataFrame with the list of all available meteorological parameters for 'sta' and their description.
     """
-    #URL = "https://data.geo.admin.ch/ch.meteoschweiz.ogd-smn/ogd-smn_meta_datainventory.csv"
-    ## climate stations (NBCN):
-    # URL = "https://data.geo.admin.ch/ch.meteoschweiz.ogd-nbcn/ogd-nbcn_meta_datainventory.csv"
+   
     assert isinstance(sta, str) and len(sta) == 3, "Argument 'sta' must be provided as a 3-letter string corresponding to the station nat_abbr !"
     assert isinstance(full_description, bool), "Bad value for argument 'full_description' ; must be True or False !" 
     assert network in ['smn', 'nbcn'], "Bad value for argument 'network' !"
@@ -166,6 +161,7 @@ def get_param_description(shortname, language='fr', network='smn'):
 
     RETURNS: a string describing the meteorological parameter.
     """
+
     assert isinstance(shortname, str), "Argument 'shortname' must be a string !"
     assert language in ['fr', 'en'], "Bad value for argument 'language' ; must be string either 'fr' or 'en' !"
     assert network in ['smn', 'nbcn'], "Bad value for argument 'network' !"
@@ -195,6 +191,7 @@ def check_parameter_availability(shortname, sta, network='smn'):
 
     RETURNS: a boolean.
     """
+
     assert isinstance(shortname, str), "Argument 'shortname' must be a string !"
     assert network in ['smn', 'nbcn'], "Bad value for argument 'network' !"
 
@@ -219,6 +216,11 @@ def _get_smn_data(sta, granularity, past_type=None, historical_period=None):
     
     RETURNS: a pd.DataFrame with the content of the retrieved csv file
     """
+
+    assert isinstance(sta, str) and len(sta) == 3, "Argument 'sta' must be provided as a 3-letter string corresponding to the station nat_abbr !"
+    assert granularity in ['t', 'h', 'd', 'm', 'y'], "Bad value for argument 'granularity' !"
+    assert past_type is None or past_type in ['now', 'recent', 'historical'], "Bad value for argument 'past_type' !"
+    assert historical_period is None or historical_period in ['1980-1989', '1990-1999', '2000-2009', '2010-2019', '2020-2029'], "Bad value for argument 'historical_period' !"
 
     ## SwissMetNet stations (SMN):
     BASE_URL_SMN = "https://data.geo.admin.ch/ch.meteoschweiz.ogd-smn"
@@ -281,7 +283,11 @@ def _get_nbcn_data(sta, granularity, past_type=None):
     
     RETURNS: a pd.DataFrame with the content of the retrieved csv file
     """
-    
+
+    assert isinstance(sta, str) and len(sta) == 3, "Argument 'sta' must be provided as a 3-letter string corresponding to the station nat_abbr !"
+    assert granularity in ['d', 'm', 'y'], "Bad value for argument 'granularity' !"
+    assert past_type is None or past_type in ['recent', 'historical'], "Bad value for argument 'past_type' !"
+        
     ## climate stations (NBCN):
     BASE_URL_NBCN = "https://data.geo.admin.ch/ch.meteoschweiz.ogd-nbcn"
     
@@ -349,12 +355,14 @@ def get_smn_measures(sta, parameters, beg=None, end=None, description_lang='fr')
                                                       If 'beg'=None, then all available data from the beginning of the recordings is retrieved.
                                                       If 'end'=None, then data until the latest available record is retrieved.
                                                       Thus, if both are None, the time series of all available recordings is retrieved.
-        - language ('fr' or 'en', default='fr'): in which language the description of the parameters should be printed to stout : 
+        - description_lang ('fr' or 'en', default='fr'): in which language the description of the parameters should be printed to stout : 
         		                                 french ('fr') or english ('en')
 
     RETURNS: pd.DataFrame : a dataframe with requested meteorological data
     """
     
+    assert description_lang in ['fr', 'en'], "Bad value for argument 'description_lang' ; must be string either 'fr' or 'en' !"
+
     if beg is not None:
         if isinstance(beg, datetime):
             pass
@@ -497,11 +505,13 @@ def get_nbcn_measures(sta, parameters, beg=None, end=None, description_lang='fr'
                                                       If 'beg'=None, then all available data from the beginning of the recordings is retrieved.
                                                       If 'end'=None, then data until the latest available record is retrieved.
                                                       Thus, if both are None, the time series of all available recordings is retrieved.
-        - language ('fr' or 'en', default='fr'): in which language the description of the parameters should be printed to stout : 
+        - description_lang ('fr' or 'en', default='fr'): in which language the description of the parameters should be printed to stout : 
         		                                 french ('fr') or english ('en')
 
     RETURNS: pd.DataFrame : a dataframe with requested meteorological data
     """
+
+    assert description_lang in ['fr', 'en'], "Bad value for argument 'description_lang' ; must be string either 'fr' or 'en' !"
     
     if beg is not None:
         if isinstance(beg, datetime):
