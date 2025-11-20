@@ -2,7 +2,11 @@
 
 This package provides a set of convenience tools to seamlessly download meteorological data collected and made available to the public as Open Government Data (OGD) by the Federal Office for Meteorology and Climatology MeteoSwiss. More information about the Open Data from MeteoSwiss is available [here](https://www.meteoswiss.admin.ch/services-and-publications/service/open-data.html).
 
-Currently, the data available through this interface concerns ground-base measurements (gbm) coming from the MeteoSwiss [automatic weather stations network](https://opendatadocs.meteoswiss.ch/a-data-groundbased/a1-automatic-weather-stations) SwissMetNet (SMN).
+Currently, the data available through this interface concerns ground-base measurements (gbm) coming from
+
+1) the [automatic weather stations network](https://opendatadocs.meteoswiss.ch/a-data-groundbased/a1-automatic-weather-stations) SwissMetNet (SMN) 
+
+2) the [swiss national basic climatological network](https://opendatadocs.meteoswiss.ch/c-climate-data/c1-climate-stations_homogeneous) (NBCN).
 
 **Important notice:**
 
@@ -28,24 +32,24 @@ import swiss_weatherdata.gbm as gbm
 Get information about all SwissMetNet (SMN) weather stations in a `pd.DataFrame`:
 
 ```
-gbm.get_smn_stations_info()
+gbm.get_stations_info(network='smn')
 ```
 Look for a meteorological parameter:
 
 ```
-gbm.get_meteo_parameters_info()
+gbm.get_meteo_parameters_info(network='smn')
 ```
 
 The `lookup` argument allows to filter meteorological parameters by category, e.g., the following lists all parameters related to Wind:
 
 ```
-gbm.get_meteo_parameters_info(lookup='wind', language='en')
+gbm.get_meteo_parameters_info(lookup='wind', language='en', network='smn')
 ```
 
 Same output but in french:
 
 ```
-gbm.get_meteo_parameters_info(lookup='vent', language='fr')
+gbm.get_meteo_parameters_info(lookup='vent', language='fr', network='smn')
 ```
 
 Currently, meteorological parameters are grouped into the following categories:
@@ -63,18 +67,23 @@ Currently, meteorological parameters are grouped into the following categories:
 | Temperature | Température |
 
 
+
+
 Get the parameter description from its shortname:
 
 ```
-gbm.get_param_description(shortname='rre150d0', language='fr')
+gbm.get_param_description(shortname='rre150d0', language='fr', network='smn')
 ```
 
 Get the list of available parameters for a given weather station. For example, at Genève-Cointrin (GVE):
 
 
 ```
-gbm.get_parameters_by_station('GVE')
+gbm.get_parameters_by_station('GVE', network='smn')
 ```
+
+**N.B.** To get information about stations/parameters belonging to the *Swiss National Basic Climatological Network*, change the network to `'nbcn'`.
+
 ### Time-granularity of recordings
 
 Recordings are generally available at different time granularities: 10 minutes, hourly, daily, monthly or yearly. 
@@ -114,6 +123,19 @@ df = gbm.get_smn_measures(
     end='201003011800'
 )
 ```
+
+
+**Example 3:** get monthly temperature deviation from the climatological mean (1991-2020) at Genève-Cointrin from January 1983 to December 2025:
+
+```
+df = gbm.get_nbcn_measures(
+    sta='GVE',
+    parameters=['th9120mv'],
+    beg='1983001010000',
+    end='202512310000'
+)
+```
+
 
 # Examples
 
